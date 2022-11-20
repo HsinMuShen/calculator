@@ -19,13 +19,14 @@ const NumberButtonArea = styled.div`
 `;
 
 const NumberButton = styled.button`
-  width: 100px;
-  height: 100px;
+  width: 80px;
+  height: 80px;
   background-color: #ffffff;
   border: 1px solid #555555;
   border-radius: 50%;
   cursor: pointer;
   font-size: 20px;
+  margin: 10px;
 `;
 
 const SymbolsButtonArea = styled.div`
@@ -50,7 +51,7 @@ const ButtonArea = ({ addWord, reset, calcResult }) => {
     "0",
     ".",
   ];
-  const symbolButtons = ["%", "×", "-", "+"];
+  const symbolButtons = ["÷", "×", "-", "+"];
   const resultButtons = ["AC", "="];
   return (
     <Wrapper>

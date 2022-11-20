@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import styled, { createGlobalStyle } from "styled-components";
+import Draggable from "react-draggable";
 
 import ButtonArea from "./ButtonArea";
 
@@ -16,7 +17,14 @@ const GlobalStyle = createGlobalStyle`
 const Wrapper = styled.div`
   display: flex;
   flex-direction: column;
-  width: 400px;
+  width: 402px;
+  border: 1px solid;
+  border-radius: 10px;
+`;
+
+const DragArea = styled.div`
+  height: 40px;
+  cursor: move;
 `;
 
 const InputArea = styled.div``;
@@ -45,7 +53,7 @@ const App = () => {
       case "+":
       case "-":
       case "×":
-      case "%":
+      case "÷":
         return "symbol";
     }
   };
@@ -83,7 +91,7 @@ const App = () => {
             if (item === "0") {
               alert(`數字開頭不得為重複 "0"`);
               return;
-            } else {
+            } else if (item !== ".") {
               tempArr.pop();
               tempArr.push(item);
               setFormulaList(tempArr);
@@ -106,17 +114,71 @@ const App = () => {
     setResult(0);
   };
 
-  const calcResult = () => {};
+  const calcResult = () => {
+    if (
+      formulaList.length === 0 ||
+      judgeInputType(formulaList[formulaList.length - 1]) === "symbol"
+    ) {
+      alert("請輸入完整算式");
+      return;
+    }
+    let i = 0;
+    let tempArr = [...formulaList];
+    while (i < tempArr.length) {
+      switch (tempArr[i]) {
+        case "×":
+          tempArr[i - 1] = (
+            Number(tempArr[i - 1]) * Number(tempArr[i + 1])
+          ).toString();
+          tempArr.splice(i, 2);
+          break;
+        case "÷":
+          tempArr[i - 1] = (
+            Number(tempArr[i - 1]) / Number(tempArr[i + 1])
+          ).toString();
+          tempArr.splice(i, 2);
+          break;
+        default:
+          i++;
+          break;
+      }
+    }
+    i = 0;
+    while (i < tempArr.length) {
+      switch (tempArr[i]) {
+        case "+":
+          tempArr[i - 1] = (
+            Number(tempArr[i - 1]) + Number(tempArr[i + 1])
+          ).toString();
+          tempArr.splice(i, 2);
+          break;
+        case "-":
+          tempArr[i - 1] = (
+            Number(tempArr[i - 1]) - Number(tempArr[i + 1])
+          ).toString();
+          tempArr.splice(i, 2);
+          break;
+        default:
+          i++;
+          break;
+      }
+    }
+    setResult(parseFloat(Number(tempArr[0]).toPrecision(12)) / 1);
+  };
   return (
     <>
       <GlobalStyle />
-      <Wrapper>
-        <InputArea>
-          <Formula>{formulaList}</Formula>
-          <Result>{result}</Result>
-        </InputArea>
-        <ButtonArea addWord={addWord} reset={reset} calcResult={calcResult} />
-      </Wrapper>
+      <Draggable handle=".drag-handler">
+        <Wrapper>
+          <DragArea className="drag-handler">點擊拖曳</DragArea>
+
+          <InputArea>
+            <Formula>{formulaList}</Formula>
+            <Result>{result}</Result>
+          </InputArea>
+          <ButtonArea addWord={addWord} reset={reset} calcResult={calcResult} />
+        </Wrapper>
+      </Draggable>
     </>
   );
 };
