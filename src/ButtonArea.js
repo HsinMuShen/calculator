@@ -36,7 +36,7 @@ const SymbolsButtonArea = styled.div`
 
 const ResultButtonArea = styled.div``;
 
-const ButtonArea = () => {
+const ButtonArea = ({ addWord, reset, calcResult }) => {
   const numbersButtons = [
     "7",
     "8",
@@ -48,28 +48,55 @@ const ButtonArea = () => {
     "2",
     "3",
     "0",
-    "00",
     ".",
   ];
-  const symbolButtons = ["/", "*", "-", "+"];
+  const symbolButtons = ["%", "×", "-", "+"];
   const resultButtons = ["AC", "="];
   return (
     <Wrapper>
       <CalculateButtonArea>
         <NumberButtonArea>
           {numbersButtons.map((num) => {
-            return <NumberButton>{num}</NumberButton>;
+            return (
+              <NumberButton
+                key={num}
+                onClick={() => {
+                  addWord(num);
+                }}
+              >
+                {num}
+              </NumberButton>
+            );
           })}
         </NumberButtonArea>
         <SymbolsButtonArea>
           {symbolButtons.map((num) => {
-            return <NumberButton>{num}</NumberButton>;
+            return (
+              <NumberButton
+                key={num}
+                onClick={() => {
+                  addWord(num);
+                }}
+              >
+                {num}
+              </NumberButton>
+            );
           })}
         </SymbolsButtonArea>
       </CalculateButtonArea>
       <ResultButtonArea>
         {resultButtons.map((num) => {
-          return <NumberButton>{num}</NumberButton>;
+          return (
+            <NumberButton
+              key={num}
+              onClick={() => {
+                if (num === "AC") reset();
+                else if (num === "=") calcResult();
+              }}
+            >
+              {num}
+            </NumberButton>
+          );
         })}
       </ResultButtonArea>
     </Wrapper>
