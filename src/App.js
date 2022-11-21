@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import styled, { createGlobalStyle } from "styled-components";
 import Draggable from "react-draggable";
 
@@ -20,20 +20,53 @@ const Wrapper = styled.div`
   width: 402px;
   border: 1px solid;
   border-radius: 10px;
+  background-color: #404258;
+  @media screen and (max-width: 768px) {
+    width: 100vw;
+    height: 50vh;
+    overflow: auto;
+  }
 `;
 
 const DragArea = styled.div`
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  color: #eeeeee;
   height: 40px;
   cursor: move;
+  @media screen and (max-width: 768px) {
+    display: none;
+  }
 `;
 
-const InputArea = styled.div``;
+const InputArea = styled.div`
+  display: flex;
+  flex-direction: column;
+`;
 
-const Formula = styled.div``;
-const Result = styled.div``;
+const Formula = styled.input`
+  height: 30px;
+  font-size: 20px;
+  border: 0px;
+  padding: 0 20px;
+  text-align: right;
+  background-color: #50577a;
+  color: #eeeeee;
+`;
+const Result = styled.input`
+  height: 44px;
+  font-size: 32px;
+  border: 0px;
+  padding: 0 20px;
+  text-align: right;
+  background-color: #50577a;
+  color: #eeeeee;
+`;
 
 const App = () => {
   const [formulaList, setFormulaList] = useState([]);
+  const [formulaDisplay, setFormulaDisplay] = useState("");
   const [result, setResult] = useState(0);
 
   const judgeInputType = (input) => {
@@ -60,7 +93,6 @@ const App = () => {
 
   const addWord = (item) => {
     const type = judgeInputType(item);
-    console.log(type);
     if (formulaList.length === 0) {
       if (type === "symbol") {
         alert("請先輸入數字");
@@ -163,18 +195,31 @@ const App = () => {
           break;
       }
     }
+    if (tempArr[0] > 2 ** 32) {
+      alert("超過數字上限，請重新輸入");
+      reset();
+      return;
+    }
     setResult(parseFloat(Number(tempArr[0]).toPrecision(12)) / 1);
   };
+
+  useEffect(() => {
+    let newDisplay = "";
+    formulaList.forEach((item) => {
+      newDisplay = newDisplay + item + " ";
+    });
+    setFormulaDisplay(newDisplay);
+  }, [formulaList]);
+
   return (
     <>
       <GlobalStyle />
       <Draggable handle=".drag-handler">
         <Wrapper>
-          <DragArea className="drag-handler">點擊拖曳</DragArea>
-
+          <DragArea className="drag-handler">點擊此處進行拖曳</DragArea>
           <InputArea>
-            <Formula>{formulaList}</Formula>
-            <Result>{result}</Result>
+            <Formula value={formulaDisplay} readOnly />
+            <Result value={result} readOnly />
           </InputArea>
           <ButtonArea addWord={addWord} reset={reset} calcResult={calcResult} />
         </Wrapper>
