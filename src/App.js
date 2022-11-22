@@ -88,53 +88,94 @@ const App = () => {
       case "×":
       case "÷":
         return "symbol";
+      case "+/-":
+        return "plusMinus";
     }
   };
 
   const addWord = (item) => {
     const type = judgeInputType(item);
+
     if (formulaList.length === 0) {
       if (type === "symbol") {
         alert("請先輸入數字");
         return;
-      } else if (type === "number") {
+      } else if (type === "number" && item !== ".") {
         setFormulaList([item]);
+      } else if (type === "plusMinus") {
+        setFormulaList(["-"]);
       }
     } else {
       let tempArr = [...formulaList];
-      if (judgeInputType(tempArr[tempArr.length - 1]) === "symbol") {
-        if (type === "number" && item !== ".") {
-          setFormulaList([...formulaList, item]);
-        } else if (type === "symbol") {
+      if (type === "plusMinus") {
+        if (
+          tempArr[tempArr.length - 1] === "-" &&
+          (judgeInputType(tempArr[tempArr.length - 2]) === "symbol" ||
+            tempArr.length === 1)
+        ) {
+          tempArr.pop();
+        } else if (judgeInputType(tempArr[tempArr.length - 1]) === "symbol") {
+          tempArr.push("-");
+        } else if (judgeInputType(tempArr[tempArr.length - 1]) !== "symbol") {
+          tempArr[tempArr.length - 1] = (
+            Number(tempArr[tempArr.length - 1]) * -1
+          ).toString();
+        }
+        setFormulaList(tempArr);
+        return;
+      } else if (type === "symbol") {
+        if (
+          tempArr[tempArr.length - 1] === "-" &&
+          (judgeInputType(tempArr[tempArr.length - 2]) === "symbol" ||
+            tempArr.length === 1)
+        ) {
+          alert("請輸入正確算式");
+          return;
+        } else if (judgeInputType(tempArr[tempArr.length - 1]) === "symbol") {
           tempArr.pop();
           tempArr.push(item);
           setFormulaList(tempArr);
-        } else if (item === ".") {
-          alert(`數字開頭不得為 "."`);
-          return;
-        }
-      } else {
-        if (type === "number") {
-          if (item === "." && tempArr[tempArr.length - 1].includes(".")) {
-            alert(`單一數字只能有一個 "."`);
+        } else if (judgeInputType(tempArr[tempArr.length - 1]) !== "symbol") {
+          if (
+            tempArr[tempArr.length - 1].indexOf(".") ===
+            tempArr[tempArr.length - 1].length - 1
+          ) {
+            alert(`數字尾數不得為 "."`);
             return;
           }
-          if (tempArr[tempArr.length - 1] === "0") {
-            if (item === "0") {
-              alert(`數字開頭不得為重複 "0"`);
-              return;
-            } else if (item !== ".") {
-              tempArr.pop();
-              tempArr.push(item);
-              setFormulaList(tempArr);
-              return;
-            }
-          }
-
-          tempArr[tempArr.length - 1] = tempArr[tempArr.length - 1] + item;
-          setFormulaList(tempArr);
-        } else if (type === "symbol") {
           tempArr.push(item);
+          setFormulaList(tempArr);
+        }
+      } else if (type === "number") {
+        if (item === "." && tempArr[tempArr.length - 1].includes(".")) {
+          alert(`單一數字只能有一個 "."`);
+          return;
+        } else if (
+          tempArr[tempArr.length - 1] === "-" &&
+          (judgeInputType(tempArr[tempArr.length - 2]) === "symbol" ||
+            tempArr.length === 1)
+        ) {
+          tempArr[tempArr.length - 1] += item;
+          setFormulaList(tempArr);
+        } else if (judgeInputType(tempArr[tempArr.length - 1]) === "symbol") {
+          if (type === "number" && item !== ".") {
+            setFormulaList([...formulaList, item]);
+          } else if (item === ".") {
+            alert(`數字開頭不得為 "."`);
+            return;
+          }
+        } else if (tempArr[tempArr.length - 1] === "0") {
+          if (item === "0") {
+            alert(`數字開頭不得為重複 "0"`);
+            return;
+          } else if (item !== ".") {
+            tempArr.pop();
+            tempArr.push(item);
+            setFormulaList(tempArr);
+            return;
+          }
+        } else {
+          tempArr[tempArr.length - 1] = tempArr[tempArr.length - 1] + item;
           setFormulaList(tempArr);
         }
       }
@@ -200,7 +241,9 @@ const App = () => {
       reset();
       return;
     }
-    setResult(parseFloat(Number(tempArr[0]).toPrecision(12)) / 1);
+    let result = parseFloat(Number(tempArr[0]).toPrecision(12)) / 1;
+    setResult(result);
+    setFormulaList([`${result}`]);
   };
 
   useEffect(() => {

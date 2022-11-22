@@ -79,6 +79,7 @@ const ButtonArea = ({ addWord, reset, calcResult }) => {
     "3",
     "0",
     ".",
+    "+/-",
   ];
   const symbolButtons = ["÷", "×", "-", "+"];
   const resultButtons = ["AC", "="];
